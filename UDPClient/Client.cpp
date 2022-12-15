@@ -5,6 +5,8 @@
 #include <windows.h>
 #include <iostream>
 #include <string>
+#include <windows.h>
+#include <vector>
 using namespace std;
 
 #pragma comment (lib, "Ws2_32.lib")
@@ -17,6 +19,9 @@ using namespace std;
 SOCKET client_socket;
 
 string nickname;
+string colour;
+
+HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE);
 
 DWORD WINAPI Sender(void* param)
 {
@@ -25,9 +30,8 @@ DWORD WINAPI Sender(void* param)
         string query;
         string fullstring;
         getline(cin,query);
-        fullstring = nickname + query;
+        fullstring = nickname + query +colour;
         send(client_socket, fullstring.c_str(), fullstring.size(), 0);
-
         // àëüòåðíàòèâíûé âàðèàíò ââîäà äàííûõ ñòðèíãîì
         // string query;
         // getline(cin, query);
@@ -38,12 +42,17 @@ DWORD WINAPI Sender(void* param)
 DWORD WINAPI Receiver(void* param)
 {
     while (true) {
+        int colour;
         char response[DEFAULT_BUFLEN];
         int result = recv(client_socket, response, DEFAULT_BUFLEN, 0);
-        response[result] = '\0';
+        colour = response[result - 1] - '0';
+        response[result-1] = '\0';
 
         // cout << "...\nYou have new response from server: " << response << "\n";
+
+        SetConsoleTextAttribute(h, colour);
         cout << response << "\n";
+        SetConsoleTextAttribute(h, 15);
         // cout << "Please insert your query for server: ";
     }
 }
@@ -108,6 +117,18 @@ int main()
         iResult = connect(client_socket, ptr->ai_addr, (int)ptr->ai_addrlen);
         cout << "Enter nickname: ";
         getline(cin, nickname);
+        system("cls");
+        for (int i = 1; i < 10; i++)
+        {
+            SetConsoleTextAttribute(h, i);
+            cout << i << '\t';
+            cout << "Sample" << endl;
+
+        }
+        SetConsoleTextAttribute(h, 15);
+        cout << "Enter colour of nickname ->";
+        cin >> colour;
+        system("cls");
         nickname += ": ";
         if (iResult == SOCKET_ERROR) {
             closesocket(client_socket);
