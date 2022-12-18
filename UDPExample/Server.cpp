@@ -89,7 +89,6 @@ int main() {
 				perror("accept function error");
 				return 5;
 			}
-
 			for (int i = 0; i < history.size(); i++)
 			{
 				cout << history[i] << "\n";
@@ -98,6 +97,8 @@ int main() {
 
 			// èíôîðìèðîâàòü ñåðâåðíóþ ñòîðîíó î íîìåðå ñîêåòà - èñïîëüçóåòñÿ â êîìàíäàõ îòïðàâêè è ïîëó÷åíèÿ
 			printf("New connection, socket fd is %d, ip is: %s, port: %d\n", new_socket, inet_ntoa(address.sin_addr), ntohs(address.sin_port));
+			
+			
 
 			// äîáàâèòü íîâûé ñîêåò â ìàññèâ ñîêåòîâ
 			for (int i = 0; i < MAX_CLIENTS; i++) {
@@ -135,7 +136,7 @@ int main() {
 				}
 
 				string temp = client_message;
-				// temp += "\n";
+				temp += "\n";
 				history.push_back(temp);
 
 				for (int i = 0; i < MAX_CLIENTS; i++) {

@@ -21,16 +21,29 @@ SOCKET client_socket;
 string nickname;
 string colour;
 
+bool isNew = true;
+
 HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE);
 
 DWORD WINAPI Sender(void* param)
 {
     while (true) {
+        string fullstring;
+        if (isNew) {
+            fullstring = nickname + " just joined the chat!\n";
+            send(client_socket, fullstring.c_str(), fullstring.length(), 0);
+            isNew = false;
+            continue;
+        }
         // cout << "Please insert your query for server: ";
         string query;
-        string fullstring;
         getline(cin,query);
-        fullstring = nickname + query +colour;
+        if (query == "off") {
+            fullstring = nickname + " has left the chat!\n";
+            send(client_socket, fullstring.c_str(), fullstring.length(), 0);
+            exit(10);
+        }
+        fullstring = nickname + ": " + query + colour;
         send(client_socket, fullstring.c_str(), fullstring.size(), 0);
         // àëüòåðíàòèâíûé âàðèàíò ââîäà äàííûõ ñòðèíãîì
         // string query;
@@ -63,9 +76,13 @@ BOOL ExitHandler(DWORD whatHappening)
     {
     case CTRL_C_EVENT: // closing console by ctrl + c
     case CTRL_BREAK_EVENT: // ctrl + break
-    case CTRL_CLOSE_EVENT: // closing the console window by X button
-      return(TRUE);
+    case CTRL_CLOSE_EVENT: {
+        string fullstring = "I left";
+        send(client_socket, fullstring.c_str(), fullstring.size(), 0);
+        Sleep(100);
         break;
+    } 
+       
     default:
         return FALSE;
     }
@@ -129,7 +146,6 @@ int main()
         cout << "Enter colour of nickname ->";
         cin >> colour;
         system("cls");
-        nickname += ": ";
         if (iResult == SOCKET_ERROR) {
             closesocket(client_socket);
             client_socket = INVALID_SOCKET;
